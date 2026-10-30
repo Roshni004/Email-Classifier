@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MailSense - CSV Results</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6fb;
+            color: #243653;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 14px;
+        }
+
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 150px;
+            padding: 18px;
+            background: #eef2ff;
+            border-radius: 10px;
+        }
+
+        .stat-card h3 {
+            margin-top: 0;
+            font-size: 15px;
+        }
+
+        .stat-card p {
+            font-size: 25px;
+            font-weight: bold;
+            margin-bottom: 0;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            overflow-wrap: anywhere;
+        }
+
+        th {
+            background: #243653;
+            color: white;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            color: #243653;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>CSV Analysis Results</h1>
+        <p>Your uploaded dataset has been processed.</p>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3>Records Read</h3>
+                <p>{{ total_records }}</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Missing Values</h3>
+                <p>{{ missing_values }}</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Duplicate Rows</h3>
+                <p>{{ duplicate_rows }}</p>
+            </div>
+        </div>
+
+        <h2>Dataset Columns</h2>
+        <p>{{ columns | join(", ") }}</p>
+
+        <h2>Preview (First 10 Rows)</h2>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        {% for column in columns %}
+                            <th>{{ column }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for record in preview %}
+                        <tr>
+                            {% for column in columns %}
+                                <td>{{ record[column] }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <a href="/">← Back to MailSense Dashboard</a>
+    </div>
+</body>
+</html>

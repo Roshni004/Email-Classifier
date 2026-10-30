@@ -1,0 +1,82 @@
+[
+    {
+        "word": "won",
+        "weight": 0.6967
+    },
+    {
+        "word": "selected",
+        "weight": 0.5527
+    },
+    {
+        "word": "congratulations",
+        "weight": 0.5258
+    },
+    {
+        "word": "lottery",
+        "weight": 0.5222
+    },
+    {
+        "word": "immediately",
+        "weight": 0.5093
+    },
+    {
+        "word": "claim",
+        "weight": 0.4839
+    },
+    {
+        "word": "gift",
+        "weight": 0.3093
+    },
+    {
+        "word": "receive",
+        "weight": 0.3054
+    },
+    {
+        "word": "contact",
+        "weight": 0.3054
+    },
+    {
+        "word": "money",
+        "weight": 0.3054
+    },
+    {
+        "word": "bonus",
+        "weight": 0.3012
+    },
+    {
+        "word": "special",
+        "weight": 0.3012
+    },
+    {
+        "word": "time",
+        "weight": 0.2987
+    },
+    {
+        "word": "limited",
+        "weight": 0.2987
+    },
+    {
+        "word": "exclusive",
+        "weight": 0.2987
+    },
+    {
+        "word": "offer",
+        "weight": 0.2987
+    },
+    {
+        "word": "10000",
+        "weight": 0.2754
+    },
+    {
+        "word": "click",
+        "weight": 0.2709
+    },
+    {
+        "word": "buy",
+        "weight": 0.2686
+    },
+    {
+        "word": "details",
+        "weight": 0.2652
+    }
+]

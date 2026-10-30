@@ -1,0 +1,41 @@
+text,spam,category,priority
+"Congratulations! You won a lottery prize of $10000. Claim now!",1,Promotion,Low
+"Win a free iPhone now. Click the link to claim your prize.",1,Promotion,Low
+"URGENT! You have won a cash reward. Send your details immediately.",1,Promotion,High
+"Get 90 percent discount on all products. Buy now!",1,Promotion,Low
+"Congratulations! You are selected for a free gift. Claim today.",1,Promotion,Low
+"Your account has won a special bonus. Click here immediately.",1,Promotion,High
+"Exclusive offer! Buy one get one free. Limited time only.",1,Promotion,Low
+"You have been selected for a lottery. Contact us to receive money.",1,Promotion,High
+"Meeting scheduled tomorrow at 10 AM. Please attend the meeting.",0,Work,High
+"Please send me the project report before Friday.",0,Work,High
+"The team meeting has been moved to 3 PM today.",0,Work,Medium
+"Please review the attached project document.",0,Work,Medium
+"Your interview is scheduled for tomorrow at 11 AM. Please confirm.",0,Work,High
+"Please complete the assigned task before the deadline.",0,Work,High
+"Team meeting reminder for today at 4 PM.",0,Work,Medium
+"Please find the monthly work report attached.",0,Work,Medium
+"Your assignment submission deadline is tomorrow.",0,Education,High
+"Please submit your practical file before Monday.",0,Education,High
+"The examination timetable has been published.",0,Education,Medium
+"Your class lecture is scheduled at 9 AM tomorrow.",0,Education,Medium
+"Please complete your data science assignment.",0,Education,Medium
+"Your project presentation is scheduled for Friday.",0,Education,High
+"Your semester examination starts next week.",0,Education,High
+"Please attend the practical session tomorrow.",0,Education,Medium
+"Your bank statement is ready. Please check your account.",0,Finance,Medium
+"Your credit card payment is due tomorrow.",0,Finance,High
+"Your monthly account statement is available.",0,Finance,Low
+"Your payment has been successfully completed.",0,Finance,Low
+"Your electricity bill payment is due today.",0,Finance,High
+"Your transaction was successfully completed.",0,Finance,Low
+"Your bank account requires verification.",0,Finance,High
+"Your personal account statement is available online.",0,Finance,Low
+"Hey, are we meeting for lunch today?",0,Personal,Low
+"Happy birthday! Hope you have a wonderful day.",0,Personal,Low
+"Can you call me when you are free?",0,Personal,Medium
+"Let's plan a trip this weekend.",0,Personal,Low
+"Mom asked you to call her when you get home.",0,Personal,Medium
+"Are you coming to dinner tonight?",0,Personal,Low
+"Please send me the photos from yesterday.",0,Personal,Low
+"Let's meet tomorrow evening.",0,Personal,Medium

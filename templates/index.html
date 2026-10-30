@@ -1,0 +1,660 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MailSense | Email Intelligence</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+<div class="app-layout">
+
+    <aside class="sidebar">
+        <a href="#dashboard" class="brand">
+            <span class="brand-icon">✉</span>
+            <span>
+                <strong>MailSense</strong>
+                <small>AI Email Intelligence</small>
+            </span>
+        </a>
+
+        <p class="nav-heading">WORKSPACE</p>
+        <nav>
+            <a class="nav-link active" href="#dashboard">▦ <span>Dashboard</span></a>
+            <a class="nav-link" href="#inbox">▣ <span>Smart Inbox</span></a>
+            <a class="nav-link" href="#analyzer">✦ <span>Analyze Email</span></a>
+            <a class="nav-link" href="#eda">▥ <span>EDA Analytics</span></a>
+            <a class="nav-link" href="#performance">▤ <span>Model Performance</span></a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="online-dot"></div>
+            <span>Classification system</span>
+            <strong>Ready</strong>
+        </div>
+    </aside>
+
+    <main class="main-content" id="dashboard">
+        <header class="topbar">
+            <div class="breadcrumb">Workspace <span>/</span> <strong>Dashboard</strong></div>
+            <div class="topbar-right">
+                <span class="system-status"><i></i> System Online</span>
+                <div class="avatar">AI</div>
+            </div>
+        </header>
+
+        <div class="page-content">
+            <section class="welcome-row">
+                <div>
+                    <p class="eyebrow">OVERVIEW</p>
+                    <h1>Email Intelligence Dashboard</h1>
+                    <p class="subheading">
+                        Monitor, classify and explore your email dataset.
+                    </p>
+                </div>
+                <a class="primary-button" href="#analyzer">+ Analyze Email</a>
+            </section>
+
+            <!-- OVERVIEW -->
+            <section class="metric-grid">
+                <article class="metric-card">
+                    <div class="metric-top">
+                        <span>Dataset Emails</span><span class="metric-icon blue">✉</span>
+                    </div>
+                    <strong>{{ eda.total }}</strong>
+                    <small>Training dataset records</small>
+                </article>
+
+                <article class="metric-card">
+                    <div class="metric-top">
+                        <span>Spam Records</span><span class="metric-icon red">⚠</span>
+                    </div>
+                    <strong>
+                        {{ eda.spam_values[eda.spam_labels.index('Spam')] if 'Spam' in eda.spam_labels else 0 }}
+                    </strong>
+                    <small>Based on dataset labels</small>
+                </article>
+
+                <article class="metric-card">
+                    <div class="metric-top">
+                        <span>High Priority</span><span class="metric-icon gold">★</span>
+                    </div>
+                    <strong>
+                        {{ eda.priority_values[eda.priority_labels.index('High')] if 'High' in eda.priority_labels else 0 }}
+                    </strong>
+                    <small>High-priority dataset records</small>
+                </article>
+
+                <article class="metric-card">
+                    <div class="metric-top">
+                        <span>Legitimate Emails</span><span class="metric-icon green">✓</span>
+                    </div>
+                    <strong>
+                        {{ eda.spam_values[eda.spam_labels.index('Not Spam')] if 'Not Spam' in eda.spam_labels else 0 }}
+                    </strong>
+                    <small>Based on dataset labels</small>
+                </article>
+            </section>
+
+            <!-- CATEGORY AND PRIORITY OVERVIEW -->
+            <section class="two-column overview-charts">
+                <article class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Category Distribution</h2>
+                            <p>Email records by category</p>
+                        </div>
+                        <span class="panel-icon">▥</span>
+                    </div>
+                    <div class="chart-box compact-chart">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </article>
+
+                <article class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Priority Overview</h2>
+                            <p>High, medium and low priority</p>
+                        </div>
+                        <span class="panel-icon">◎</span>
+                    </div>
+                    <div class="chart-box compact-chart">
+                        <canvas id="priorityChart"></canvas>
+                    </div>
+                </article>
+            </section>
+
+            <!-- EMAIL ANALYZER -->
+            <section class="panel section-gap" id="analyzer">
+                <div class="section-title">
+                    <div>
+                        <p class="eyebrow">MACHINE LEARNING</p>
+                        <h2>Analyze an Email</h2>
+                        <p>Classify an email using your trained models.</p>
+                    </div>
+                </div>
+
+                <form action="{{ url_for('analyze_email') }}" method="POST">
+                    <label for="email_text">Email message</label>
+                    <textarea id="email_text" name="email_text"
+                        rows="5" placeholder="Paste the email content here..."
+                        required>{{ result.text if result else '' }}</textarea>
+                    <div class="form-footer">
+                        <small>Predictions depend on the quality of the training data.</small>
+                        <button class="primary-button" type="submit">Analyze Message →</button>
+                    </div>
+                </form>
+
+                {% if error %}
+                <div class="alert error-alert">{{ error }}</div>
+                {% endif %}
+
+                {% if result %}
+                <div class="result-panel">
+                    <h3>Classification Results</h3>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <span>Spam Status</span>
+                            <strong class="{{ 'text-red' if result.spam == 'Spam' else 'text-green' }}">
+                                {{ result.spam }}
+                            </strong>
+                        </div>
+                        <div class="result-item">
+                            <span>Email Category</span>
+                            <strong>{{ result.category }}</strong>
+                        </div>
+                        <div class="result-item">
+                            <span>Priority</span>
+                            <strong>{{ result.priority }}</strong>
+                        </div>
+                        {% if result.confidence is defined %}
+                        <div class="result-item">
+                            <span>Spam Model Confidence</span>
+                            <strong>{{ result.confidence }}%</strong>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- EXPLORATORY DATA ANALYSIS -->
+            <section id="eda" class="section-gap">
+                <div class="section-title">
+                    <div>
+                        <p class="eyebrow">DATA SCIENCE / EDA</p>
+                        <h2>Exploratory Data Analysis</h2>
+                        <p>Explore data quality, text characteristics and label patterns.</p>
+                    </div>
+                    <span class="soft-badge">Dataset analysis</span>
+                </div>
+
+                <div class="metric-grid eda-metrics">
+                    <article class="metric-card">
+                        <span class="muted-label">Missing Values</span>
+                        <strong>{{ eda.missing }}</strong>
+                        <small>Across required columns</small>
+                    </article>
+                    <article class="metric-card">
+                        <span class="muted-label">Duplicate Emails</span>
+                        <strong>{{ eda.duplicates }}</strong>
+                        <small>Repeated non-empty text</small>
+                    </article>
+                    <article class="metric-card">
+                        <span class="muted-label">Average Email Length</span>
+                        <strong>{{ eda.average_words }}</strong>
+                        <small>Words per non-empty email</small>
+                    </article>
+                    <article class="metric-card">
+                        <span class="muted-label">Empty Messages</span>
+                        <strong>{{ eda.empty }}</strong>
+                        <small>Messages with no text</small>
+                    </article>
+                </div>
+
+                <div class="two-column">
+                    <article class="panel">
+                        <div class="panel-heading">
+                            <div>
+                                <h2>Spam vs Legitimate</h2>
+                                <p>Class distribution in the dataset</p>
+                            </div>
+                        </div>
+                        <div class="chart-box">
+                            <canvas id="spamChart"></canvas>
+                        </div>
+                    </article>
+
+                    <article class="panel">
+                        <div class="panel-heading">
+                            <div>
+                                <h2>Email Length Distribution</h2>
+                                <p>Word count per message</p>
+                            </div>
+                        </div>
+                        <div class="chart-box">
+                            <canvas id="lengthChart"></canvas>
+                        </div>
+                    </article>
+
+                    <article class="panel">
+                        <div class="panel-heading">
+                            <div>
+                                <h2>Most Frequent Words</h2>
+                                <p>Common words after basic stopword removal</p>
+                            </div>
+                        </div>
+                        <div class="chart-box">
+                            <canvas id="wordsChart"></canvas>
+                        </div>
+                    </article>
+
+                    <article class="panel">
+                        <div class="panel-heading">
+                            <div>
+                                <h2>Category vs Spam</h2>
+                                <p>Label counts grouped by category</p>
+                            </div>
+                        </div>
+                        <div class="chart-box">
+                            <canvas id="crossChart"></canvas>
+                        </div>
+                    </article>
+                </div>
+
+                <article class="panel section-gap">
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Dataset Quality Report</h2>
+                            <p>Missing values for each required column</p>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th>Column</th><th>Missing Values</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for column, count in eda.missing_by_column.items() %}
+                                <tr>
+                                    <td>{{ column }}</td>
+                                    <td>
+                                        <span class="soft-badge">{{ count }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="footnote">
+                        Missing values are counted in the source CSV before the
+                        dashboard fills empty text or label fields for analysis.
+                    </p>
+                </article>
+            </section>
+
+            <!-- MODEL PERFORMANCE -->
+            <section id="performance" class="section-gap">
+                <div class="section-title">
+                    <div>
+                        <p class="eyebrow">MODEL EVALUATION</p>
+                        <h2>Model Performance</h2>
+                        <p>Evaluation metrics from the saved training report.</p>
+                    </div>
+                </div>
+
+                {% if metrics %}
+                <article class="panel">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Model</th>
+                                    <th>Accuracy</th>
+                                    <th>Precision</th>
+                                    <th>Recall</th>
+                                    <th>F1-score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for model_name, values in metrics.items() %}
+                                {% if values is mapping %}
+                                <tr>
+                                    <td>{{ model_name }}</td>
+                                    <td>{{ values.get('accuracy', 'N/A') }}</td>
+                                    <td>{{ values.get('precision', 'N/A') }}</td>
+                                    <td>{{ values.get('recall', 'N/A') }}</td>
+                                    <td>{{ values.get('f1_score', values.get('f1-score', 'N/A')) }}</td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+                {% else %}
+                <article class="panel empty-state">
+                    <div class="empty-icon">▤</div>
+                    <h3>Model metrics are not available</h3>
+                    <p>
+                        Train your models and save evaluation metrics to
+                        <code>model_metrics.json</code> to display them here.
+                    </p>
+                </article>
+                {% endif %}
+            </section>
+
+            <!-- SMART INBOX -->
+            <section id="inbox" class="panel section-gap">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">EMAIL EXPLORER</p>
+                        <h2>Smart Inbox</h2>
+                        <p>Search the original dataset and inspect its labels.</p>
+                    </div>
+                    <span class="soft-badge">{{ emails|length }} shown</span>
+                </div>
+
+                <input type="search" id="emailSearch" class="search-input"
+                    placeholder="Search email text, category, priority or status...">
+
+
+                
+<!-- Pinned Emails Section -->
+<div class="pinned-emails-section">
+    <h3>📌 Pinned Emails</h3>
+
+    {% set pinned_list = emails | selectattr("id", "string") | list %}
+
+    {% set pinned_list = [] %}
+    {% for email in emails %}
+        {% if email.id|string in pinned_emails %}
+            {% set _ = pinned_list.append(email) %}
+        {% endif %}
+    {% endfor %}
+
+    {% if pinned_list %}
+        {% for email in pinned_list %}
+            <div class="pinned-email-card">
+                <strong>{{ email.category }} · {{ email.priority }} Priority</strong>
+                <p>{{ email.text[:150] }}{% if email.text|length > 150 %}…{% endif %}</p>
+                <form action="/toggle-pin" method="POST">
+                    <input type="hidden" name="email_id" value="{{ email.id }}">
+                    <button type="submit" class="pin-button">📍 Unpin</button>
+                </form>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="no-pinned-emails">No pinned emails yet. Click 📍 in the email table to pin one.</p>
+    {% endif %}
+</div>
+    
+
+                <div class="table-wrap">
+                    <table id="emailTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Email Content</th>
+                                <th>Spam Status</th>
+                                <th>Category</th>
+                                <th>Priority</th>
+                                <th>Pin</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+{% for email in emails %}
+<tr class="email-row {% if email.id|string in pinned_emails %}pinned-row{% endif %}">
+    <td>#{{ email.id }}</td>
+
+    <td class="email-message">
+        <details>
+            <summary>
+                {{ email.text[:100] }}{% if email.text|length > 100 %}…{% endif %}
+            </summary>
+            <p>{{ email.text }}</p>
+        </details>
+    </td>
+
+    <td>
+        <span class="status-badge {{ 'status-spam' if email.spam == 'Spam' else 'status-safe' }}">
+            {{ email.spam }}
+        </span>
+    </td>
+
+    <td>{{ email.category }}</td>
+    <td>{{ email.priority }}</td>
+
+    <td>
+        <form action="/toggle-pin" method="POST" class="pin-form">
+            <input type="hidden" name="email_id" value="{{ email.id }}">
+            <button type="submit" class="pin-button"
+                    title="{% if email.id|string in pinned_emails %}Unpin email{% else %}Pin email{% endif %}">
+                {% if email.id|string in pinned_emails %}📌{% else %}📍{% endif %}
+            </button>
+        </form>
+    </td>
+</tr>
+{% else %}
+<tr><td colspan="6">No dataset records found.</td></tr>
+{% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+                <p class="footnote">
+                    Inbox rows show original dataset labels. New predictions are
+                    produced in the Analyze Email section.
+                </p>
+            </section>
+
+            <footer class="footer">
+                <span>MailSense · AI Email Intelligence</span>
+                <span>Academic Data Science Project</span>
+            </footer>
+        </div>
+        
+<!-- CSV Upload Section -->
+<section class="upload-section" id="csv-upload">
+    <div class="upload-header">
+        <h2>Upload Email Dataset</h2>
+        <p>Upload a CSV file to explore and analyze your email data.</p>
+    </div>
+
+    <form action="/upload-csv"
+          method="POST"
+          enctype="multipart/form-data"
+          class="upload-form">
+
+        <label for="csv_file">Choose CSV file</label>
+
+        <input
+            type="file"
+            id="csv_file"
+            name="csv_file"
+            accept=".csv,text/csv"
+            required
+        >
+
+        <p class="upload-help">
+            CSV files only. For email analysis, include a text column.
+        </p>
+
+        <button type="submit" class="upload-btn">
+            Upload and Analyze
+        </button>
+    </form>
+</section>
+<!-- End CSV Upload Section -->        
+    </main>
+</div>
+
+<script>
+const eda = {{ eda | tojson }};
+const palette = {
+    blue: "#5B8DEF",
+    red: "#E87979",
+    green: "#5CB99A",
+    gold: "#E8B45B",
+    purple: "#9B87E8",
+    muted: "#8998AA",
+    grid: "#E9EEF4"
+};
+
+Chart.defaults.color = palette.muted;
+Chart.defaults.font.family = "Inter, Segoe UI, sans-serif";
+
+function makeChart(id, type, labels, datasets, extraOptions = {}) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+
+    new Chart(canvas, {
+        type: type,
+        data: { labels: labels, datasets: datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: "bottom" }
+            },
+            ...extraOptions
+        }
+    });
+}
+
+function countDataset(labels, values, color) {
+    return [{
+        label: "Emails",
+        data: values,
+        backgroundColor: color,
+        borderRadius: 5,
+        borderWidth: 0
+    }];
+}
+
+// Category distribution
+makeChart(
+    "categoryChart", "bar",
+    eda.category_labels,
+    countDataset(eda.category_labels, eda.category_values, palette.blue),
+    {
+        indexAxis: "y",
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { beginAtZero: true, ticks: { precision: 0 },
+                 grid: { color: palette.grid } },
+            y: { grid: { display: false } }
+        }
+    }
+);
+
+// Priority overview
+makeChart(
+    "priorityChart", "bar",
+    eda.priority_labels,
+    countDataset(eda.priority_labels, eda.priority_values, palette.green),
+    {
+        indexAxis: "y",
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { beginAtZero: true, ticks: { precision: 0 },
+                 grid: { color: palette.grid } },
+            y: { grid: { display: false } }
+        }
+    }
+);
+
+// Spam distribution
+makeChart(
+    "spamChart", "doughnut",
+    eda.spam_labels,
+    [{
+        data: eda.spam_values,
+        backgroundColor: [palette.red, palette.green, palette.muted],
+        borderWidth: 0,
+        hoverOffset: 6
+    }],
+    { cutout: "68%" }
+);
+
+// Email length
+makeChart(
+    "lengthChart", "bar",
+    eda.length_labels,
+    countDataset(eda.length_labels, eda.length_values, palette.blue),
+    {
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { display: false } },
+            y: { beginAtZero: true, ticks: { precision: 0 },
+                 grid: { color: palette.grid } }
+        }
+    }
+);
+
+// Frequent words
+makeChart(
+    "wordsChart", "bar",
+    [...eda.word_labels].reverse(),
+    countDataset(
+        eda.word_labels,
+        [...eda.word_values].reverse(),
+        palette.purple
+    ),
+    {
+        indexAxis: "y",
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { beginAtZero: true, ticks: { precision: 0 },
+                 grid: { color: palette.grid } },
+            y: { grid: { display: false } }
+        }
+    }
+);
+
+// Category vs spam
+makeChart(
+    "crossChart", "bar",
+    eda.cross_labels,
+    [
+        {
+            label: "Spam",
+            data: eda.cross_spam,
+            backgroundColor: palette.red,
+            borderRadius: 4
+        },
+        {
+            label: "Not Spam",
+            data: eda.cross_legitimate,
+            backgroundColor: palette.green,
+            borderRadius: 4
+        }
+    ],
+    {
+        scales: {
+            x: { grid: { display: false } },
+            y: { beginAtZero: true, ticks: { precision: 0 },
+                 grid: { color: palette.grid } }
+        }
+    }
+);
+
+// Search inbox
+const searchInput = document.getElementById("emailSearch");
+if (searchInput) {
+    searchInput.addEventListener("input", function () {
+        const query = this.value.toLowerCase().trim();
+
+        document.querySelectorAll(".email-row").forEach(row => {
+            row.hidden = !row.textContent.toLowerCase().includes(query);
+        });
+    });
+}
+</script>
+</body>
+</html>
